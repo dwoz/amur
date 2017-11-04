@@ -102,14 +102,6 @@ def run_migrations(root, ctxt, migrator, start_at='', stop_at='', direction='up'
     migrator.after_migrations(start_at, stop_at, direction, root, step)
 
 
-class KeyspaceMigrator(object):
-
-    def __init__(self, session):
-        self.session = session
-
-    def __call__(self, stmt, ctxt, *args, **kwargs):
-        print('execute: {}'.format(repr(stmt.format(**ctxt))))
-        self.session.execute(stmt.format(**ctxt), [])
 
 if __name__ == '__main__':
     # sudo ifconfig lo0 alias 127.0.0.2 up
@@ -119,6 +111,17 @@ if __name__ == '__main__':
     from cassandra.cluster import Cluster
     from cassandra.auth import PlainTextAuthProvider
     from cassandra.policies import DCAwareRoundRobinPolicy, RoundRobinPolicy, TokenAwarePolicy
+
+    class KeyspaceMigrator(object):
+
+        def __init__(self, session):
+            self.session = session
+
+        def __call__(self, stmt, ctxt, *args, **kwargs):
+            print('execute: {}'.format(repr(stmt.format(**ctxt))))
+            self.session.execute(stmt.format(**ctxt), [])
+
+
     hosts = ['127.0.0.1', '127.0.0.2', '127.0.0.3']
     port = 9042
     username = 'cassandra'
