@@ -99,9 +99,11 @@ def list_migrations(root, start_at='', stop_at='', direction='up', **kwargs):
 def run_migrations(root, ctxt, migrator, start_at='', stop_at='', direction='up', **kwargs):
     _ctxt = kwargs.get('_base_ctxt', context).copy()
     _ctxt.update(ctxt)
+    migrator.before_migrations(start_at, stop_at, direction, root)
     for step in iter_steps(root, start_at, stop_at, direction):
         for stmt in step[direction]:
             migrator(stmt, _ctxt)
+    migrator.after_migrations(start_at, stop_at, direction, root, step)
 
 
 class KeyspaceMigrator(object):
